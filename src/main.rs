@@ -14,8 +14,8 @@ struct LighthouseAudit {
     id: String,
     title: String,
     description: String,
-    score: f64,
-    score_display_mode: String,
+    score: Option<f64>,
+    score_display_mode: Option<String>,
     numeric_value: Option<f64>,
     numeric_unit: Option<String>,
     display_value: Option<String>
