@@ -1,8 +1,13 @@
+#[macro_use]
+extern crate tera;
+
 use std::collections::HashMap;
 
 use serde::Deserialize;
 use std::fs::File;
 use std::io::Read;
+use tera::{Tera, Context};
+use std::fs;
 
 #[derive(Deserialize)]
 struct LighthouseReport {
@@ -25,6 +30,7 @@ fn main() {
     println!("Hello, world!");
 
     load_report();
+    template_diff();
 }
 
 fn load_report() {
@@ -35,4 +41,15 @@ fn load_report() {
     let report: LighthouseReport = serde_json::from_str(&data).unwrap();
 
     println!("loaded {} audits", report.audits.len());
+}
+
+fn template_diff() {
+    let tera = Tera::new("templates/*").unwrap();
+
+    let mut context = Context::new();
+    context.insert("test", "42");
+
+    let res = tera.render("base.html", &context).unwrap();
+
+    fs::write("result.html", res).unwrap();
 }
