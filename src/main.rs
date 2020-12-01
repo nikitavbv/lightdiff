@@ -40,7 +40,10 @@ fn load_report() {
 
     let report: LighthouseReport = serde_json::from_str(&data).unwrap();
 
+    let score_sum: f64 = report.audits.iter().filter_map(|v| v.1.score).sum();
+
     println!("loaded {} audits", report.audits.len());
+    println!("total score is {}", score_sum);
 }
 
 fn template_diff() {
