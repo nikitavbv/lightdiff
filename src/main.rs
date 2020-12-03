@@ -14,7 +14,7 @@ struct LighthouseReport {
     audits: HashMap<String, LighthouseAudit>
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 struct LighthouseAudit {
     id: String,
     title: String,
@@ -26,24 +26,51 @@ struct LighthouseAudit {
     display_value: Option<String>
 }
 
+struct LighthouseReportDiff {
+    matched_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>,
+    changed_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>
+}
+
 fn main() {
     println!("Hello, world!");
 
-    load_report();
+    let before = load_report("before.json");
+    let after = load_report("after.json");
+
+    let report_diff = report_diff(before, after);
+
+    println!("found {} matching and {} changed audits", report_diff.matched_audits.len(), report_diff.changed_audits.len());
+
     template_diff();
 }
 
-fn load_report() {
-    let mut file = File::open("example.json").unwrap();
+fn report_diff(before: LighthouseReport, after: LighthouseReport) -> LighthouseReportDiff {
+    let matched_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)> = before.audits.iter()
+        .filter(|v| after.audits.contains_key(v.0) && audit_matches(v.1, after.audits.get(v.0).unwrap()))
+        .map(|v| (v.0.clone(), (v.1.clone(), after.audits.get(v.0).unwrap().clone())))
+        .collect();
+
+    let changed_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)> = before.audits.iter()
+        .filter(|v| after.audits.contains_key(v.0) && !audit_matches(v.1, after.audits.get(v.0).unwrap()))
+        .map(|v| (v.0.clone(), (v.1.clone(), after.audits.get(v.0).unwrap().clone())))
+        .collect();
+
+    LighthouseReportDiff {
+        matched_audits,
+        changed_audits
+    }
+}
+
+fn audit_matches(before: &LighthouseAudit, after: &LighthouseAudit) -> bool {
+    before.score == after.score
+}
+
+fn load_report(file_name: &str) -> LighthouseReport {
+    let mut file = File::open(file_name).unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
 
-    let report: LighthouseReport = serde_json::from_str(&data).unwrap();
-
-    let score_sum: f64 = report.audits.iter().filter_map(|v| v.1.score).sum();
-
-    println!("loaded {} audits", report.audits.len());
-    println!("total score is {}", score_sum);
+    serde_json::from_str(&data).unwrap()
 }
 
 fn template_diff() {
