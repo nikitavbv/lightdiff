@@ -11,7 +11,9 @@ use std::fs;
 
 #[derive(Deserialize)]
 struct LighthouseReport {
-    audits: HashMap<String, LighthouseAudit>
+    #[serde(rename="finalUrl")]
+    final_url: String,
+    audits: HashMap<String, LighthouseAudit>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -37,14 +39,14 @@ fn main() {
     let before = load_report("before.json");
     let after = load_report("after.json");
 
-    let report_diff = report_diff(before, after);
+    let report_diff = report_diff(&before, &after);
 
     println!("found {} matching and {} changed audits", report_diff.matched_audits.len(), report_diff.changed_audits.len());
 
-    template_diff();
+    template_diff(&before, &after, &report_diff);
 }
 
-fn report_diff(before: LighthouseReport, after: LighthouseReport) -> LighthouseReportDiff {
+fn report_diff(before: &LighthouseReport, after: &LighthouseReport) -> LighthouseReportDiff {
     let matched_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)> = before.audits.iter()
         .filter(|v| after.audits.contains_key(v.0) && audit_matches(v.1, after.audits.get(v.0).unwrap()))
         .map(|v| (v.0.clone(), (v.1.clone(), after.audits.get(v.0).unwrap().clone())))
@@ -73,7 +75,7 @@ fn load_report(file_name: &str) -> LighthouseReport {
     serde_json::from_str(&data).unwrap()
 }
 
-fn template_diff() {
+fn template_diff(before: &LighthouseReport, after: &LighthouseReport, diff: &LighthouseReportDiff) {
     let tera = Tera::new("templates/*").unwrap();
 
     let mut context = Context::new();
