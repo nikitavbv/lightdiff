@@ -3,20 +3,20 @@ extern crate tera;
 
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::Read;
 use tera::{Tera, Context};
 use std::fs;
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct LighthouseReport {
     #[serde(rename="finalUrl")]
     final_url: String,
     audits: HashMap<String, LighthouseAudit>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 struct LighthouseAudit {
     id: String,
     title: String,
@@ -28,6 +28,7 @@ struct LighthouseAudit {
     display_value: Option<String>
 }
 
+#[derive(Serialize)]
 struct LighthouseReportDiff {
     matched_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>,
     changed_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>
@@ -79,7 +80,7 @@ fn template_diff(before: &LighthouseReport, after: &LighthouseReport, diff: &Lig
     let tera = Tera::new("templates/*").unwrap();
 
     let mut context = Context::new();
-    context.insert("test", "42");
+    context.insert("before_url", &before.final_url);
 
     let res = tera.render("base.html", &context).unwrap();
 
