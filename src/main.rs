@@ -84,6 +84,7 @@ fn template_diff(before: &LighthouseReport, after: &LighthouseReport, diff: &Lig
     context.insert("after_url", &after.final_url);
     context.insert("before_audits", &before.audits);
     context.insert("after_audits", &after.audits);
+    context.insert("diff", &diff);
 
     let res = tera.render("base.html", &context).unwrap();
 

@@ -17,11 +17,13 @@
                 <th>Before</th>
                 <th>After</th>
             </tr>
-            <tr>
-                <td>Example</td>
-                <td>0</td>
-                <td>1</td>
-            </tr>
+            {% for audit in audits %}
+                <tr>
+                    <td>{{ audit.name }}</td>
+                    <td>{{ audit.before }}</td>
+                    <td>{{ audit.after }}</td>
+                </tr>
+            {% endfor %}
         </table>
     </body>
 </html>
