@@ -30,6 +30,7 @@ struct LighthouseAudit {
 
 #[derive(Serialize)]
 struct LighthouseReportDiff {
+    audits: Vec<LighthouseAuditDiff>,
     matched_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>,
     changed_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>
 }
