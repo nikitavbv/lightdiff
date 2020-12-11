@@ -35,6 +35,13 @@ struct LighthouseReportDiff {
     changed_audits: HashMap<String, (LighthouseAudit, LighthouseAudit)>
 }
 
+#[derive(Serialize)]
+struct LighthouseAuditDiff {
+    audit: LighthouseAudit,
+    score_before: Option<f64>,
+    score_after: Option<f64>,
+}
+
 fn main() {
     println!("Hello, world!");
 
