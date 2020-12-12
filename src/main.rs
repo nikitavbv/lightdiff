@@ -66,7 +66,14 @@ fn report_diff(before: &LighthouseReport, after: &LighthouseReport) -> Lighthous
         .map(|v| (v.0.clone(), (v.1.clone(), after.audits.get(v.0).unwrap().clone())))
         .collect();
 
+    let audits: Vec<LighthouseAuditDiff> = changed_audits.iter().map(|v| LighthouseAuditDiff {
+        audit: v.1.1.clone(),
+        score_before: v.1.0.score.clone(),
+        score_after: v.1.1.score.clone(),
+    }).collect();
+
     LighthouseReportDiff {
+        audits,
         matched_audits,
         changed_audits
     }
