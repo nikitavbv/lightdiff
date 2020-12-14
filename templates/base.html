@@ -20,8 +20,8 @@
             {% for audit in audits %}
                 <tr>
                     <td>{{ audit.name }}</td>
-                    <td>{{ audit.before }}</td>
-                    <td>{{ audit.after }}</td>
+                    <td>{{ audit.score_before }}</td>
+                    <td>{{ audit.score_after }}</td>
                 </tr>
             {% endfor %}
         </table>

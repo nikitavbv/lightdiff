@@ -37,6 +37,7 @@ struct LighthouseReportDiff {
 
 #[derive(Serialize)]
 struct LighthouseAuditDiff {
+    name: String,
     audit: LighthouseAudit,
     score_before: Option<f64>,
     score_after: Option<f64>,
@@ -67,6 +68,7 @@ fn report_diff(before: &LighthouseReport, after: &LighthouseReport) -> Lighthous
         .collect();
 
     let audits: Vec<LighthouseAuditDiff> = changed_audits.iter().map(|v| LighthouseAuditDiff {
+        name: "Hello World".to_string(),
         audit: v.1.1.clone(),
         score_before: v.1.0.score.clone(),
         score_after: v.1.1.score.clone(),
