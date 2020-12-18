@@ -1,3 +1,4 @@
+#![feature(total_cmp)]
 #[macro_use]
 extern crate tera;
 
@@ -96,13 +97,19 @@ fn load_report(file_name: &str) -> LighthouseReport {
 fn template_diff(before: &LighthouseReport, after: &LighthouseReport, diff: &LighthouseReportDiff) {
     let tera = Tera::new("templates/*").unwrap();
 
+    let mut audits = diff.audits.clone();
+    audits.sort_by(|a, b| {
+        (a.score_before.unwrap() - a.score_after.unwrap())
+            .total_cmp(&(b.score_before.unwrap() - b.score_after.unwrap()))
+    });
+
     let mut context = Context::new();
     context.insert("before_url", &before.final_url);
     context.insert("after_url", &after.final_url);
     context.insert("before_audits", &before.audits);
     context.insert("after_audits", &after.audits);
     context.insert("diff", &diff);
-    context.insert("audits", &diff.audits);
+    context.insert("audits", &diff.audits.sort);
 
     let res = tera.render("base.html", &context).unwrap();
 
